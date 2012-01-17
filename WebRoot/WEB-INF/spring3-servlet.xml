@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation=" 
+           http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd
+           http://www.springframework.org/schema/mvc 
+           http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd" default-autowire="byName">
+	<!-- 约定优于配置，约定优于配置 -->
+	
+	<!-- 配置静态资源，直接映射到对应的文件夹，不被DispatcherServlet处理，3.04新增功能，需要重新设置spring-mvc-3.0.xsd -->
+	<mvc:resources mapping="/img/**" location="/img/"/>
+	<mvc:resources mapping="/js/**" location="/js/"/>
+	<mvc:resources mapping="/css/**" location="/css/"/>
+
+	<!-- 扫描所有的controller -->
+	<context:component-scan base-package="com.fsj.spring.web" />
+
+	<!-- InternalResourceViewResolver默认的就是JstlView所以这里就不用配置viewClass了 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/view/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	
+	<!-- 启用基于注解的处理器映射，添加拦截器，类级别的处理器映射 -->
+	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+        <property name="interceptors">
+            <list>
+                <bean class="com.fsj.spring.util.MyHandlerInterceptor"/>
+            </list>
+        </property>
+	</bean>
+	
+	<!-- 
+	配置一个基于注解的定制的WebBindingInitializer，解决日期转换问题，方法级别的处理器映射，
+	有人说该bean要放在context:component-scan前面，要不然不起作用，但我试的放后面也可以啊。
+	-->
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+	    <property name="cacheSeconds" value="0" />
+	    <property name="webBindingInitializer">
+	        <bean class="com.fsj.spring.util.MyWebBinding" />
+	    </property>
+	</bean>
+	
+</beans> 
