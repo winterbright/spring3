@@ -50,6 +50,7 @@ public class UserController {
 			return "login";
 		}else {
 			request.getSession().setAttribute(Constants.USER_INFO_SESSION, user1);
+			System.out.println("aa");
 			return "welcome";
 		}
 	}
